@@ -13,7 +13,7 @@ echo " #     # ######   #####  #######
 
 function install_dependencies(){
 	if [ `which apt-get >/dev/null 2>&1; echo $?` -ne 0 ]; then
-		yum install -y kernel-devel libaio-devel gcc-c++ perl python  
+		yum install -y kernel-devel libaio-devel gcc-c++ perl python perl-Time-HiRes  
 	else
 		apt-get install -y build-essential libaio-dev perl
 	fi

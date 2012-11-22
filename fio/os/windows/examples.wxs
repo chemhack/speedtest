@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="examples">
+                <Component>
+                    <File Source="..\..\examples\1mbs_clients" />
+                </Component>
+                <Component>
+                    <File Source="..\..\examples\aio-read" />
+                </Component>
+                <Component>
+                    <File Source="..\..\examples\disk-zone-profile" />
+                </Component>
+                <Component>
+                    <File Source="..\..\examples\fsx" />
+                </Component>
+                <Component >
+                    <File Source="..\..\examples\iometer-file-access-server" />
+                </Component>
+                <Component>
+                    <File Source="..\..\examples\netio" />
+                </Component>
+                <Component>
+                    <File Source="..\..\examples\ssd-test" />
+                </Component>
+                <Component>
+                    <File Source="..\..\examples\surface-scan" />
+                </Component>
+                <Component>
+                    <File Source="..\..\examples\tiobench-example" />
+                </Component>
+                <Component>
+                  <File Source="..\..\examples\null" />
+                </Component>
+                <Component>
+                  <File Source="..\..\examples\flow" />
+                </Component>
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="examples">
+            <ComponentRef Id="_1mbs_clients" />
+            <ComponentRef Id="aio_read" />
+            <ComponentRef Id="disk_zone_profile" />
+            <ComponentRef Id="fsx" />
+            <ComponentRef Id="iometer_file_access_server" />
+            <ComponentRef Id="netio" />
+            <ComponentRef Id="ssd_test" />
+            <ComponentRef Id="surface_scan" />
+            <ComponentRef Id="tiobench_example" />
+            <ComponentRef Id="null" />
+            <ComponentRef Id="flow" />
+        </ComponentGroup>
+    </Fragment>
+</Wix>

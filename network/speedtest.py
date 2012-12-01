@@ -14,7 +14,7 @@ import socket
 
 HOST = 'speedtest02.cmc.co.ndcwest.comcast.net'
 UPLOAD_URL = '/speedtest/upload.php'
-RUNS = 2
+RUNS = 1
 VERBOSE = 0
 HTTPDEBUG = 0
 
@@ -31,12 +31,12 @@ DOWNLOAD_FILES = [
 ]
 
 # MAX UPLOAD TIME
-TIME_LIMIT = 60 * 5 # 5 min
+TIME_LIMIT = 60 * 0.5 # 5 min
 
 UPLOAD_FILES = [
-    (1024, 256), # (BLOCK_SIZE, BLOCK_NUM)
-    (1024, 512),
-    (1024, 1024),
+#    (1024, 256), # (BLOCK_SIZE, BLOCK_NUM)
+#    (1024, 512),
+#    (1024, 1024),
     (1024, 1024 * 2),
     (1024, 1024 * 4),
     (1024, 1024 * 4),
@@ -108,32 +108,32 @@ def uploadthread(connection, block_size, block_num, time_limit):
         data = ('0' * block_size for x in range(block_num))
         # send the first byte
         connection.send('0')
-        count += 1
-        start = time()
+        self_thread.time_cost=0
+        self_thread.bytes_count=1
         for block in data:
+            start = time()
+            print start-1354382987
             connection.send(block)
-            count += len(block)
-            if time() - start >= time_limit:
+            self_thread.time_cost += time() - start
+            self_thread.bytes_count += len(block)
+            print pretty_speed(self_thread.bytes_count*8/self_thread.time_cost)
+            if self_thread.time_cost >= time_limit:
                 printv('upload interrupted due to time is up, bytes sent: %d' % count)
                 break
-        response = connection.getresponse()
+#        response = count.getresponse()
     except httplib.ResponseNotReady, e:
         printv('failed to upload for %s: %s' % (url, e))
     except httplib.BadStatusLine, e:
         printv('failed to upload for %s: %s' % (url, e))
     except httplib.CannotSendRequest, e:
         printv('failed to upload for %s: %s' % (url, e))
-    else:
-        if 200 == response.status:
-            reply = response.read()
-            printv('reply %s' % reply)
-            printv('reply size: %d' % len(reply))
-            self_thread.uploaded = int(reply.split('=')[1])
-        else:
-            printv('http status error for %s: %d' % (url, response.status))
-    connection.close()
-    self_thread.time_cost = time() - start
-    self_thread.bytes_count = count
+#    else:
+#        if 200 == response.status:
+#            reply = response.read()
+#            printv('reply %s' % reply)
+#        else:
+#            printv('http status error for %s: %d' % (url, response.status))
+#    connection.close()
 
 
 def upload():
@@ -308,20 +308,19 @@ def main():
     if mode & 4 == 4:
         print 'Ping: %d ms' % ping(HOST)
     if mode & 1 == 1:
-        print 'Download speed: ' + pretty_speed(download())
+        print 'No Download'
+#        print 'Download speed: ' + pretty_speed(download())
     if mode & 2 == 2:
         print 'Upload speed: ' + pretty_speed(upload())
 
 
 def pretty_speed(speed):
-    return str(speed)
-
-#    units = [ 'bps', 'Kbps', 'Mbps', 'Gbps' ]
-#    unit = 0
-#    while speed >= 1024:
-#        speed /= 1024
-#        unit += 1
-#    return '%0.2f %s' % (speed, units[unit])
+    units = [ 'bps', 'Kbps', 'Mbps', 'Gbps' ]
+    unit = 0
+    while speed >= 1024:
+        speed /= 1024
+        unit += 1
+    return '%0.2f %s' % (speed, units[unit])
 
 if __name__ == '__main__':
     main()

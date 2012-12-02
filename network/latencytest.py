@@ -107,13 +107,13 @@ class SpeedTest:
         return {'min': times[0], 'max': times[len(times) - 1], 'avg': avg, 'mdev': mdev}
 
     def pingAll(self):
-        f = open('server.txt', 'r')
+        f = open('china.txt', 'r')
         for line in f.readlines():
             data = line.split('\t')
             self.pingQueue.put(data)
 #            print data[3]+", "+data[4] + "\t" + str(self.ping(data[0])['avg'])
         threads=[]
-        for x in range(50):
+        for x in range(5):
             thread=Thread(target=self.pingWorker, args=())
             thread.start()
             threads.append(thread)
@@ -122,12 +122,12 @@ class SpeedTest:
         return
     def pingWorker(self):
         while True:
-            data=self.pingQueue.get_nowait()
-            if data is None:
+            if self.pingQueue.empty():
                 break
+            data=self.pingQueue.get()
             print data[3]+", "+data[4] + "\t" + str(self.ping(data[0])['avg'])
+            self.pingQueue.task_done()
         return
-
 
 def main():
     test = SpeedTest()

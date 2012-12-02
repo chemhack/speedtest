@@ -107,7 +107,7 @@ class SpeedTest:
         return {'min': times[0], 'max': times[len(times) - 1], 'avg': avg, 'mdev': mdev}
 
     def pingAll(self):
-        f = open('china.txt', 'r')
+        f = open('server.txt', 'r')
         for line in f.readlines():
             data = line.split('\t')
             self.pingQueue.put(data)

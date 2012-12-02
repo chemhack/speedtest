@@ -113,7 +113,7 @@ class SpeedTest:
             self.pingQueue.put(data)
 #            print data[3]+", "+data[4] + "\t" + str(self.ping(data[0])['avg'])
         threads=[]
-        for x in range(5):
+        for x in range(20):
             thread=Thread(target=self.pingWorker, args=())
             thread.start()
             threads.append(thread)

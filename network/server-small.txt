@@ -1,0 +1,70 @@
+http://speedtest2.dtacnetwork.co.th/speedtest/upload.aspx	13.7522	100.4939	Bangkok	Thailand	DTAC
+http://speedtest.romm.no/speedtest/upload.php	60.15	11.1833	Jessheim	Norway	Romm AS
+http://speedtest.zapp.ch/mini/speedtest/upload.php	46.9333	7.5667	Worb	Switzerland	ZAPP AG
+http://speedbgl.netcabo.co.ao/speedtest/upload.php	-12.3667	13.5333	Lobito	Angola	TVCabo Angola
+http://speedtest.tamico.com/speedtest/upload.php	61.5	23.7667	Tampere	Finland	Tamico Oy
+http://pav-st-01.kcell.kz/speedtest/upload.php	52.3	76.95	Pavlodar	Kazakhstan	Kcell
+http://speedtest.ibtelecom.net.br/speedtest/upload.php	-12.9747	-38.4767	Salvador	Brazil	IB Telecom
+http://speedtest.unetvale.net/speedtest/upload.php	-27.2414	-48.6336	Tijucas	Brazil	Unetvale
+http://speedtest.cellcom.co.il/speedtest/upload.php	32.3333	34.85	Netanya	Israel	Cellcom Israel ltd.
+http://monitor.scarlet.an/speedtest/speedtest/upload.php	12.1833	-69	Curacao	Netherlands Antilles	Scarlet N.V. Curacao
+http://202.98.1.11/mini/speedtest/upload.php	43.88	125.3166	Changchun	China	China Unicom
+http://speedtest1.server-admins.net/speedtest/upload.aspx	-26.107	28.0517	Sandton	South Africa	server-admins.NET
+http://201.167.127.2/speedtest/upload.php	20.3833	-100	San Juan Del Río	Mexico	Cablevision Red S.A. de C.V
+http://Speed.rconnects.com/speedtest/upload.php	45.2082	-122.0669	Estacada, OR	United States	Reliance Connects
+http://skyinet.org/speedtest/speedtest/upload.php	44.4975	34.1731	Yalta	Ukraine	ISP Skyinet
+http://speedtest.plateautel.net/speedtest/upload.asp	34.4125	-103.2047	Clovis, NM	United States	Plateau Telecom
+http://www.minet.sk/speedtest/speedtest/upload.php	48.7492	21.9014	Michalovce	Slovakia	Minet s.r.o.
+http://speed.netcabo.co.ao/speedtest/upload.php	-8.8383	13.2344	Luanda	Angola	TVCabo Angola
+http://sto-bstn-01.sys.comcast.net/speedtest/upload.php	42.3578	-71.0617	Boston, MA	United States	Comcast
+http://st1.dubna.ru/speedtest/upload.php	56.7333	37.1667	Dubna	Russian Federation	Contact Company Ltd.
+http://speedtest.nn.ertelecom.ru/speedtest/upload.php	56.3333	44	Nizhniy Novgorod	Russian Federation	DOM.RU
+http://speedtest.kaliningrad.u-disk.ru/speedtest/upload.php	54.7167	20.5167	Kaliningrad	Russian Federation	Rostelecom
+http://spd1cun.cablemas.net.mx/speedtest/upload.php	21.1606	-86.8475	Cancun	Mexico	Cablemas
+http://speedtest1.aircel.com/speedtest/upload.php	13.0839	80.27	Chennai	India	Aircel
+http://speedtest.haidagwaii.net/speedtest/upload.php	53.2544	-132.0944	Queen Charlotte, BC	Canada	qcislands net Ltd
+http://www.edlink18.net/speedtest/speedtest/upload.php	32.005	-102.0992	Midland, TX	United States	Region 18 Edu Services
+http://speedsrv1.vvm.com/mini/speedtest/upload.php	31.0936	-97.3622	Temple, TX	United States	VVM Inc
+http://206.55.91.135/speedtest/speedtest/upload.php	45.5081	-73.555	Montreal, QC	Canada	belair technologies
+http://speedtest.anvianet.fi/speedtest/upload.php	63.1	21.6	Vaasa	Finland	Anvia Oyj
+http://speed.cybernet.tj/speedtest/upload.php	38.5366	68.78	Dushanbe	Tajikistan	Babylon-T
+http://speedtest1-delhi.aircel.com/speedtest/upload.php	28.61	77.23	New Delhi	India	Aircel
+http://spt01krnyne.krny.ne.charter.com/speedtest/upload.php	40.7571	-99.1087	Kearney, NE	United States	Charter Communications
+http://speedtest.skynet.lt/speedtest/upload.php	54.6833	25.3167	Vilnius	Lithuania	Penki Kontinentai
+http://speedtest.astpage.ru/speedtest/upload.php	46.3236	48.0366	Astrakhan	Russian Federation	Astpage
+http://rychlost.giganet.cz/speedtest/upload.php	50.0833	14.4167	Prague	Czech Republic	GIGANET.cz
+http://info.telecom-net.ru/speedtest/upload.php	55.92	36.8687	Istra	Russian Federation	Telecom-Net Network
+http://speedtest.netline.cl/mini/speedtest/upload.php	-33.4378	-70.6503	Santiago	Chile	Netline Telecomunicaciones
+http://201.167.124.2/speedtest/upload.php	21.8833	-102.3	Aguascalientes	Mexico	Cablevision Red SA de CV
+http://speedtest01.youlan.ru/speedtest/upload.php	56.8333	60.5833	Yekaterinburg	Russian Federation	YouLAN
+http://www.ensite.com.br/speedtest/speedtest/upload.php	-21.2886	-50.34	Birigui	Brazil	Ensite Telecom
+http://ssi-knta-speedtest01.ssimicro.com/speedtest/upload.php	45.3333	-75.9	Kanata, ON	Canada	SSI Micro
+http://speedtest.ipv.net.pl/speedtest/upload.php	50.9833	18.2167	Kluczbork	Poland	PROMEDIA
+http://www.netins.net/mini/speedtest/upload.php	41.5908	-93.6208	Des Moines, IA	United States	Iowa Network Services, Inc.
+http://speedtest.comnet.bg/speedtest/upload.php	42.5	27.4667	Burgas	Bulgaria	ComNet Bulgaria
+http://speedtest1.leon.pl/speedtest/upload.php	50.0921	18.5475	Rybnik	Poland	Leon Sp. z o.o.
+http://speedtest-1.silverip.net/speedtest/upload.php	41.813	-87.656	Chicago, IL	United States	SilverIP Communications
+http://geny.it/speedtest/upload.php	40.679	14.7566	Salerno	Italy	Geny Communications
+http://www.speed.com.do/speedtest/upload.php	18.5	-69.9833	Santo Domingo	Dominican Republic	Claro Dominicana
+http://ks-sptest.kbro.com.tw/speedtest/upload.php	22.671	120.488	Pingtung	Taiwan	kbro CO.LTD
+http://speedtest.isurgut.ru/speedtest/upload.php	61.2667	73.4	Surgut	Russian Federation	OJSC Rostelecom
+http://speedtest.deltacable.com/speedtest/upload.php	49.1481	-122.9125	Delta, BC	Canada	Delta Cable
+http://speedtest.bitcom.com.br/speedtest/upload.php	-29.1667	-51.1833	Caxias do Sul	Brazil	Bitcom
+http://67.219.60.14/speedtest/upload.php	43.1656	-77.6114	Rochester, NY	United States	Rackwire.com
+http://vsmu.vinnica.ua/speedtest/speedtest/upload.php	49.2333	28.4833	Vinnytsia	Ukraine	VNMU
+http://speedtest.usinternet.com/speedtest/upload.php	44.9133	-93.5031	Minnetonka, MN	United States	US Internet
+http://speed2.nulinkdigital.com/speedtest/upload.php	33.3764	-84.7886	Newnan, GA	United States	NuLink
+http://speedtest1.airnet.net.nz/ookla/speedtest/upload.php	-39.4833	176.9167	Napier	New Zealand	NOW
+http://74.212.128.3/speedtest/upload.php	47.61	-122.33	Seattle, WA	United States	Towerstream
+http://speedtest.uraltelecom.ru/speedtest/upload.php	51.2	58.5667	Orsk	Russian Federation	JSC "BIG Telecom Ural"
+http://tarvalon.ural.net/speedtest/upload.php	56.8333	60.5833	Ekaterinburg	Russian Federation	Ural WES
+http://speedtest.i-jetcity.ru/speedtest/upload.php	57.15	65.5333	Tyumen	Russian Federation	I-Jet Communications
+http://201.167.126.2/speedtest/upload.php	20.6833	-101.35	Irapuato	Mexico	Cablevision Red SA de CV
+http://speedtest.movistar.com.pe/speedtest/upload.aspx	-12.0433	-77.0283	Lima	Peru	Telefonica del Peru
+http://speedtest.rb.mtn.co.za/speedtest/upload.php	-26.1453	28.0406	Randburg	South Africa	MTN SA
+http://speedtest.sevsk.29-region.ru/speedtest/upload.php	64.5681	39.8317	Severodvinsk	Russian Federation	MTS
+http://speed1.claro.com.hn/mini/speedtest/upload.php	15.5	-88.0333	San Pedro Sula	Honduras	Claro Honduras
+http://speedtest.usmetrotel.com/speedtest/upload.php	26.1531	-81.7986	Naples, FL	United States	U.S. Metropolitan Telecom
+http://losangeles-speedtest.atlanticmetro.net/speedtest/upload.php	34.0522	-118.2428	Los Angeles, CA	United States	Atlantic Metro
+http://speedtest.vermontel.net/speedtest/upload.php	43.3	-72.4833	Springfield, VT	United States	VTel
+http://speedtest.wi-tribe.jo/speedtest/upload.php	31.9333	35.9333	Amman	Jordan	wi-tribe Jordan

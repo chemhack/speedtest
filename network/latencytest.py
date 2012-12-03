@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import socket
 
 import urllib, httplib
 import getopt, sys
@@ -27,7 +28,9 @@ MAX_UPLOAD_TIME = 30 #Limit: 30s
 MIN_UPLOAD_TIME = 15 #Limit: 15s
 
 class SpeedTest:
-    pingQueue = Queue()
+    def __init__(self):
+        self.pingQueue = Queue()
+        self.output = None
 
     def download(self, baseUrl):
         parsedUrl = urlparse(baseUrl)
@@ -45,8 +48,10 @@ class SpeedTest:
                     response = connection.getresponse()
                 except httplib.BadStatusLine, e:
                     print('error when downloading %s: %s' % (baseUrl, e))
+                    return None
                 except httplib.CannotSendRequest, e:
                     print('error when downloading %s: %s' % (baseUrl, e))
+                    return None
                 else:
                     while True:
                         # download buffer size = 10KB
@@ -90,59 +95,129 @@ class SpeedTest:
 
     def ping(self, url):
         parsedUrl = urlparse(url)
-        connection = httplib.HTTPConnection(parsedUrl.netloc)
-        connection.connect()
-        times = []
-        for i in range(10):
-            start_time = time()
-            connection.request('GET', parsedUrl.path + '?x=' + str(random.random()), None,
-                    {'Connection': 'Keep-Alive'})
-            response = connection.getresponse()
-            response.read()
-            total_ms = (time() - start_time) * 1000
-            times.append(total_ms)
-        connection.close()
-        times.sort()
-        avg = sum(times) / len(times)
-        mdev = sqrt(sum((x - avg) ** 2 for x in times) / len(times))
-        return {'min': times[0], 'max': times[len(times) - 1], 'avg': avg, 'mdev': mdev}
+        try:
+            connection = httplib.HTTPConnection(parsedUrl.netloc, timeout=10)
+            connection.connect()
+            times = []
+            for i in range(5):
+                start_time = time()
+                connection.request('GET', parsedUrl.path + '?x=' + str(random.random()), None,
+                        {'Connection': 'Keep-Alive'})
+                response = connection.getresponse()
+                response.read()
+                total_ms = (time() - start_time) * 1000
+                times.append(total_ms)
+            connection.close()
+            times.sort()
+            avg = sum(times) / len(times)
+            mdev = sqrt(sum((x - avg) ** 2 for x in times) / len(times))
+            return {'min': times[0], 'max': times[len(times) - 1], 'avg': avg, 'mdev': mdev}
+        except Exception:
+            return None
 
     def pingAll(self):
         f = open('server.txt', 'r')
         for line in f.readlines():
-            data = line.split('\t')
+            data = line.strip().split('\t')
             self.pingQueue.put(data)
-        #            print data[3]+", "+data[4] + "\t" + str(self.ping(data[0])['avg'])
         threads = []
-        for x in range(20):
-            thread = Thread(target=self.pingWorker, args=())
+        self.writeLine("****ping****")
+        self.pingResults = []
+        progressThread = Thread(target=self.progressWorker)
+        progressThread.start()
+        for x in range(50):
+            thread = Thread(target=self.pingWorker, args=[self.pingResults])
             thread.start()
             threads.append(thread)
         for thread in threads:
             thread.join()
+        for result in self.pingResults:
+            ping = result['ping']
+            self.writeLine('%s\t%.3f/%.3f/%.3f/%.3f' % (result['server'][0], ping['min'],ping['avg'],ping['avg'],ping['mdev']))
+        self.writeLine("****end****")
+        return self.pingResults
+
+    def progressWorker(self):
+        while True:
+            finished = len(self.pingResults)
+            left = self.pingQueue.unfinished_tasks
+            if not left:
+                break
+            print("Ping: %.2f%%" % (finished * 100.0 / (finished + left)))
+            sleep(5)
         return
 
-    def pingWorker(self):
+    def writeLine(self, content):
+        if self.output:
+            self.output.write(content + '\n')
+
+    def smartTest(self):
+        return
+
+    def pingWorker(self, results):
         while True:
             if self.pingQueue.empty():
-                break
-            data = self.pingQueue.get()
-            print data[3] + ", " + data[4] + "\t" + str(self.ping(data[0])['avg'])
+                return
+            server = self.pingQueue.get()
+            result = self.ping(server[0])
+            if result:
+                results.append({'server': server, 'ping': result})
             self.pingQueue.task_done()
         return
 
 
+def usage():
+    print '''
+usage: speedtest.py [-h] [-s S] [-o S]
+
+Test your bandwidth speed using Speedtest.net servers.
+
+optional arguments:
+ -h, --help         show this help message and exit
+ -s S, --server=S   run test with specific server
+ -o o, --output=O   write output in text file
+    '''
+
+
 def main():
-    test = SpeedTest()
-    #    start=time()
-    #    test.pingAll()
-    #    print time()-start
-    print test.ping('http://down.yiinet.net/speedtest/speedtest/latency.txt')
-    print test.download('http://down.yiinet.net/speedtest/speedtest/')
-    print test.upload('http://down.yiinet.net/speedtest/speedtest/upload.aspx')
-    print test.ping('http://speed.dtgt.org/speedtest/latency.txt')
-    print test.download('http://speed.dtgt.org/speedtest/')
-    print test.upload('http://speed.dtgt.org/speedtest/upload.php')
+    speedTest = SpeedTest()
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hs:o:", ["help", "server=", "output="])
+    except getopt.GetoptError, err:
+        print str(err)
+        usage()
+        sys.exit(2)
+    for o, a in opts:
+        if o in ("-h", "--help"):
+            usage()
+            sys.exit()
+        elif o in ("-o", "--output"):
+            speedTest.output = open(a, 'w')
+    results = speedTest.pingAll()
+    #    cityDict = {}
+    #    for result in results:
+    #        server = result['server']
+    #        cityCountry = server[3] + '\t' + server[4]
+    #        if not cityDict.has_key(cityCountry):
+    #            cityDict[cityCountry] = []
+    #        cityDict[cityCountry].append(result)
+    #    filteredResult = []
+    #    for value in cityDict.values():
+    #        value.sort(key=lambda value: value['result']['avg'])
+    #        if len(value) > 3:
+    #            filteredResult.extend(value[:3])
+    #        else:
+    #            filteredResult.extend(value)
+    #    for result in filteredResult:
+    #    #        print result['server']
+    #        print '\t'.join(result['server'])
+    #        #    print time()-start
+    #    print speedTest.ping('http://down.yiinet.net/speedTest/speedTest/latency.txt')
+    #    print speedTest.download('http://down.yiinet.net/speedTest/speedTest/')
+    #    print speedTest.upload('http://down.yiinet.net/speedTest/speedTest/upload.aspx')
+    #    print speedTest.ping('http://speed.dtgt.org/speedTest/latency.txt')
+    #    print speedTest.download('http://speed.dtgt.org/speedTest/')
+    #    print speedTest.upload('http://speed.dtgt.org/speedTest/upload.php')
     return
 
 if __name__ == '__main__':

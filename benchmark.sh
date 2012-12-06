@@ -30,4 +30,5 @@ mk_log_dir
 chmod u+x run.sh
 nohup ./run.sh > ./log/run.log 2>&1 & &> /dev/null
 
+echo "Benchmark started in backgroud, you will be notified by email after the benchmark is done. It's safe to terminate SSH connection now. "
 tail -n 25 -F ./log/run.log

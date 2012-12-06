@@ -116,7 +116,7 @@ class SpeedTest:
             return None
 
     def pingAll(self):
-        f = open('server-small.txt', 'r')
+        f = open('server.txt', 'r')
         for line in f.readlines():
             data = line.strip().split('\t')
             self.pingQueue.put(data)
@@ -160,7 +160,7 @@ class SpeedTest:
         #find best server
         bestServer=min(self.pingResults,key=lambda x:x['ping']['avg'])
         uploadUrl = bestServer['server'][0]
-#        self.writeLine('best server: %0.2f ' % bestServer['ping']['avg'])
+        self.writeLine('best server: %0.2f ' % bestServer['ping']['avg'])
 #        print
         print self.download(self.toBaseUrl(uploadUrl))
         print self.upload(uploadUrl)
@@ -193,12 +193,6 @@ optional arguments:
 
 def main():
     speedTest = SpeedTest()
-    print speedTest.ping('http://down.yiinet.net/speedtest/speedtest/upload.aspx')
-#    print speedTest.download('http://down.yiinet.net/speedtest/speedtest/')
-#    print speedTest.upload('http://down.yiinet.net/speedtest/speedtest/upload.aspx')
-    print speedTest.ping('http://speed.dtgt.org/speedtest/upload.php')
-#    print speedTest.download('http://speed.dtgt.org/speedtest/')
-#    print speedTest.upload('http://speed.dtgt.org/speedtest/upload.php')
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hs:o:", ["help", "server=", "output="])
     except getopt.GetoptError, err:

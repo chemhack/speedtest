@@ -12,6 +12,7 @@ import bisect
 import re
 from math import sqrt
 from Queue import Queue
+from collections import deque
 
 DOWNLOAD_FILES = [
     'random350x350.jpg',
@@ -23,10 +24,11 @@ DOWNLOAD_FILES = [
     'random4000x4000.jpg'
 ]
 MAX_DOWNLOAD_TIME = 30 #Limit: 30s
-MIN_DOWNLOAD_TIME = 15 #Limit: 15s
+MIN_DOWNLOAD_TIME = 20 #Limit: 20s
 MAX_UPLOAD_TIME = 30 #Limit: 30s
-MIN_UPLOAD_TIME = 15 #Limit: 15s
+MIN_UPLOAD_TIME = 20 #Limit: 20s
 
+#noinspection PyBroadException
 class SpeedTest:
     def __init__(self):
         self.pingQueue = Queue()
@@ -40,11 +42,13 @@ class SpeedTest:
         time_count = 0
         start_time = time()
         shouldStop = False
-        while not(shouldStop or time_count > MIN_DOWNLOAD_TIME):
+        checkpoint_time = time()
+        checkpoint_speeds = deque([], maxlen=10)
+        while not (shouldStop or time_count > MIN_DOWNLOAD_TIME):
             for fileName in DOWNLOAD_FILES:
                 try:
                     connection.request('GET', parsedUrl.path + fileName + '?x=' + str(int(time() * 1000)), None,
-                            {'Connection': 'Keep-Alive'})
+                        {'Connection': 'Keep-Alive'})
                     response = connection.getresponse()
                 except httplib.BadStatusLine, e:
                     print('error when downloading %s: %s' % (baseUrl, e))
@@ -56,9 +60,18 @@ class SpeedTest:
                     while True:
                         # download buffer size = 10KB
                         content = response.read(1024 * 10)
-                        time_count = time() - start_time
+                        current_time = time()
                         if content:
                             byte_count += len(content)
+                            time_count = current_time - start_time
+                            if current_time - checkpoint_time > 1:
+                                checkpoint_speeds.append(byte_count * 8 / time_count)
+                                checkpoint_time = current_time
+                                if len(checkpoint_speeds) == 10 and self.mdev(checkpoint_speeds) / self.avg(
+                                    checkpoint_speeds) < 0.05:
+                                    response.close()
+                                    shouldStop = True
+                                    break
                             if time_count > MAX_DOWNLOAD_TIME:
                                 response.close()
                                 shouldStop = True
@@ -67,30 +80,44 @@ class SpeedTest:
                             break
                 if shouldStop:
                     break
-        return byte_count * 8 / time_count
+        connection.close()
+        return self.avg(checkpoint_speeds)
 
     def upload(self, url):
         parsedUrl = urlparse(url)
         time_count = 0
         byte_count = 0
         shouldStop = False
-        while not(shouldStop or time_count > MIN_DOWNLOAD_TIME):
+        checkpoint_time = time()
+        checkpoint_speeds = deque([], maxlen=10)
+        while not (shouldStop or time_count > MIN_DOWNLOAD_TIME):
             connection = httplib.HTTPConnection(parsedUrl.netloc)
             connection.connect()
             connection.request('POST', url, None,
-                    {'Connection': 'Keep-Alive', 'Content-Type': 'application/x-www-form-urlencoded',
-                     'Content-Length': 1024 * 100 * 1000 + 1})
+                {'Connection': 'Keep-Alive', 'Content-Type': 'application/x-www-form-urlencoded',
+                 'Content-Length': 1024 * 100 * 1000 + 1})
             #send the first byte
             connection.send('0')
             block = '0' * 1024 * 100
+            start = time()
+            time_count_connection = 0
             for x in range(1000):
-                start = time()
                 connection.send(block)
-                time_count += time() - start
+                current_time = time()
+                time_count_connection = current_time - start
                 byte_count += len(block)
-                if time_count > MAX_UPLOAD_TIME:
+                if current_time - checkpoint_time > 1:
+                    checkpoint_speeds.append(byte_count * 8 / (time_count + time_count_connection))
+                    checkpoint_time = current_time
+                    if len(checkpoint_speeds) == 10 and self.mdev(checkpoint_speeds) / self.avg(
+                        checkpoint_speeds) < 0.05:
+                        shouldStop = True
+                        break
+                if time_count + time_count_connection > MAX_UPLOAD_TIME:
                     shouldStop = True
                     break
+            time_count += time_count_connection
+            connection.close()
         return byte_count * 8 / time_count
 
     def ping(self, url):
@@ -102,18 +129,25 @@ class SpeedTest:
             for i in range(5):
                 start_time = time()
                 connection.request('GET', parsedUrl.path + '?x=' + str(random.random()), None,
-                        {'Connection': 'Keep-Alive'})
+                    {'Connection': 'Keep-Alive'})
                 response = connection.getresponse()
                 response.read()
                 total_ms = (time() - start_time) * 1000
                 times.append(total_ms)
             connection.close()
             times.sort()
-            avg = sum(times) / len(times)
-            mdev = sqrt(sum((x - avg) ** 2 for x in times) / len(times))
+            avg = self.avg(times)
+            mdev = self.mdev(times)
             return {'min': times[0], 'max': times[len(times) - 1], 'avg': avg, 'mdev': mdev}
         except Exception:
             return None
+
+    def avg(self, list):
+        return sum(list) * 1.0 / len(list)
+
+    def mdev(self, list):
+        avg = self.avg(list)
+        return sqrt(sum((x - avg) ** 2 for x in list) / len(list))
 
     def pingAll(self):
         f = open('server.txt', 'r')
@@ -121,6 +155,7 @@ class SpeedTest:
             data = line.strip().split('\t')
             self.pingQueue.put(data)
         threads = []
+        print "Ping %d servers world wide"%self.pingQueue.qsize()
         self.writeLine("****ping****")
         self.pingResults = []
         progressThread = Thread(target=self.progressWorker)
@@ -133,17 +168,23 @@ class SpeedTest:
             thread.join()
         for result in self.pingResults:
             ping = result['ping']
-            self.writeLine('%s\t%.3f/%.3f/%.3f/%.3f' % (result['server'][0], ping['min'],ping['avg'],ping['avg'],ping['mdev']))
+            self.writeLine(
+                '%s\t%.3f/%.3f/%.3f/%.3f' % (result['server'][0], ping['min'], ping['avg'], ping['max'], ping['mdev']))
         self.writeLine("****end****")
         return self.pingResults
 
     def progressWorker(self):
+        printedHash=0
         while True:
             finished = len(self.pingResults)
             left = self.pingQueue.unfinished_tasks
             if not left:
                 break
-            print("Ping: %.2f%%" % (finished * 100.0 / (finished + left)))
+            hashCount= int(finished * 10 / (finished + left))
+            if hashCount>printedHash:
+                for x in xrange(hashCount-printedHash):
+                    print "#",
+                printedHash=hashCount
             sleep(5)
         return
 
@@ -151,17 +192,17 @@ class SpeedTest:
         if self.output:
             self.output.write(content + '\n')
 
-    def toBaseUrl(self,uploadUrl):
-        m=re.search('(.*/)(upload\.\w+)',uploadUrl)
+    def toBaseUrl(self, uploadUrl):
+        m = re.search('(.*/)(upload\.\w+)', uploadUrl)
         return m.group(1)
 
     def smartTest(self):
         self.pingAll()
         #find best server
-        bestServer=min(self.pingResults,key=lambda x:x['ping']['avg'])
+        bestServer = min(self.pingResults, key=lambda x: x['ping']['avg'])
         uploadUrl = bestServer['server'][0]
-        self.writeLine('best server: %0.2f ' % bestServer['ping']['avg'])
-#        print
+        self.writeLine('****best server****')
+        self.writeLine('latency: %0.2f url:%s ' % (bestServer['ping']['avg'],bestServer['server'][0]))
         print self.download(self.toBaseUrl(uploadUrl))
         print self.upload(uploadUrl)
         return
@@ -206,6 +247,7 @@ def main():
         elif o in ("-o", "--output"):
             speedTest.output = open(a, 'w')
     speedTest.smartTest()
+#    print speedTest.upload('http://speedtest.netstream.ch/speedtest/upload.php')
     #    results = speedTest.pingAll()
     #    cityDict = {}
     #    for result in results:

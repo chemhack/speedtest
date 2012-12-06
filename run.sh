@@ -1,6 +1,7 @@
 #!/bin/bash
 #copyleft 2012 vpstrace.com
 
+LANG="en_US"
 echo "Running fio...."
 cd fio
 make

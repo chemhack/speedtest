@@ -70,8 +70,8 @@ class SpeedTest:
                                 if len(checkpoint_speeds) == 10 and self.mdev(checkpoint_speeds) / self.avg(
                                     checkpoint_speeds) < 0.05:
                                     response.close()
-                                    shouldStop = True
-                                    break
+                                    connection.close()
+                                    return self.avg(checkpoint_speeds)
                             if time_count > MAX_DOWNLOAD_TIME:
                                 response.close()
                                 shouldStop = True
@@ -81,7 +81,7 @@ class SpeedTest:
                 if shouldStop:
                     break
         connection.close()
-        return self.avg(checkpoint_speeds)
+        return byte_count * 8 / time_count
 
     def upload(self, url):
         parsedUrl = urlparse(url)
@@ -111,8 +111,8 @@ class SpeedTest:
                     checkpoint_time = current_time
                     if len(checkpoint_speeds) == 10 and self.mdev(checkpoint_speeds) / self.avg(
                         checkpoint_speeds) < 0.05:
-                        shouldStop = True
-                        break
+                        connection.close()
+                        return self.avg(checkpoint_speeds)
                 if time_count + time_count_connection > MAX_UPLOAD_TIME:
                     shouldStop = True
                     break
@@ -155,7 +155,7 @@ class SpeedTest:
             data = line.strip().split('\t')
             self.pingQueue.put(data)
         threads = []
-        print "Ping %d servers world wide"%self.pingQueue.qsize()
+        print "Ping %d servers world wide" % self.pingQueue.qsize()
         self.writeLine("****ping****")
         self.pingResults = []
         progressThread = Thread(target=self.progressWorker)
@@ -174,17 +174,17 @@ class SpeedTest:
         return self.pingResults
 
     def progressWorker(self):
-        printedHash=0
+        printedHash = 0
         while True:
             finished = len(self.pingResults)
             left = self.pingQueue.unfinished_tasks
             if not left:
                 break
-            hashCount= int(finished * 10 / (finished + left))
-            if hashCount>printedHash:
-                for x in xrange(hashCount-printedHash):
+            hashCount = int(finished * 10 / (finished + left))
+            if hashCount > printedHash:
+                for x in xrange(hashCount - printedHash):
                     print "#",
-                printedHash=hashCount
+                printedHash = hashCount
             sleep(5)
         return
 
@@ -199,12 +199,37 @@ class SpeedTest:
     def smartTest(self):
         self.pingAll()
         #find best server
+        print "Testing best server worldwide"
         bestServer = min(self.pingResults, key=lambda x: x['ping']['avg'])
         uploadUrl = bestServer['server'][0]
         self.writeLine('****best server****')
-        self.writeLine('latency: %0.2f url:%s ' % (bestServer['ping']['avg'],bestServer['server'][0]))
-        print self.download(self.toBaseUrl(uploadUrl))
-        print self.upload(uploadUrl)
+        self.writeLine('server: %s' % bestServer['server'][0])
+        self.writeLine('latency: %0.2f' % bestServer['ping']['avg'])
+        download = self.download(self.toBaseUrl(uploadUrl))
+        self.writeLine('download: %f' % download)
+        upload = self.upload(uploadUrl)
+        self.writeLine('upload: %f' % upload)
+        self.writeLine('****end****')
+        countriesToTest = []
+        for line in open('location.txt', 'r').readlines():
+            line = line.strip()
+            if not line == bestServer['server'][4]:
+                countriesToTest.append(line)
+        self.writeLine('****countries****')
+        for country in countriesToTest:
+            print "Testing best server worldwide in %s" % country
+            serversInCountry = filter(lambda ping: ping['server'][4] == country, self.pingResults)
+            if len(serversInCountry):
+                bestServerInCountry = min(serversInCountry, key=lambda x: x['ping']['avg'])
+                uploadUrl = bestServerInCountry['server'][0]
+                self.writeLine('country: %s' % country)
+                self.writeLine('server: %s' % bestServerInCountry['server'][0])
+                self.writeLine('latency: %0.2f' % bestServerInCountry['ping']['avg'])
+                download = self.download(self.toBaseUrl(uploadUrl))
+                self.writeLine('download: %f' % download)
+                upload = self.upload(uploadUrl)
+                self.writeLine('upload: %f' % upload)
+        self.writeLine('****end****')
         return
 
     def pingWorker(self, results):
@@ -247,7 +272,7 @@ def main():
         elif o in ("-o", "--output"):
             speedTest.output = open(a, 'w')
     speedTest.smartTest()
-#    print speedTest.upload('http://speedtest.netstream.ch/speedtest/upload.php')
+    #    print speedTest.upload('http://speedtest.netstream.ch/speedtest/upload.php')
     #    results = speedTest.pingAll()
     #    cityDict = {}
     #    for result in results:

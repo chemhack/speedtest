@@ -1,4 +1,10 @@
-Beijing China
-Shanghai    China
-Los Angeles, CA
-
+United States
+China
+India
+Japan
+Brazil
+Germany
+Russian Federation
+Indonesia
+South Africa
+Canada

@@ -83,10 +83,10 @@ class SpeedTest:
             #send the first byte
             connection.send('0')
             block = '0' * 1024 * 100
-            start = time()
             for x in range(1000):
+                start = time()
                 connection.send(block)
-                time_count = time() - start
+                time_count += time() - start
                 byte_count += len(block)
                 if time_count > MAX_UPLOAD_TIME:
                     shouldStop = True
@@ -116,7 +116,7 @@ class SpeedTest:
             return None
 
     def pingAll(self):
-        f = open('server.txt', 'r')
+        f = open('server-small.txt', 'r')
         for line in f.readlines():
             data = line.strip().split('\t')
             self.pingQueue.put(data)
@@ -151,7 +151,19 @@ class SpeedTest:
         if self.output:
             self.output.write(content + '\n')
 
+    def toBaseUrl(self,uploadUrl):
+        m=re.search('(.*/)(upload\.\w+)',uploadUrl)
+        return m.group(1)
+
     def smartTest(self):
+        self.pingAll()
+        #find best server
+        bestServer=min(self.pingResults,key=lambda x:x['ping']['avg'])
+        uploadUrl = bestServer['server'][0]
+#        self.writeLine('best server: %0.2f ' % bestServer['ping']['avg'])
+#        print
+        print self.download(self.toBaseUrl(uploadUrl))
+        print self.upload(uploadUrl)
         return
 
     def pingWorker(self, results):
@@ -181,6 +193,12 @@ optional arguments:
 
 def main():
     speedTest = SpeedTest()
+    print speedTest.ping('http://down.yiinet.net/speedtest/speedtest/upload.aspx')
+#    print speedTest.download('http://down.yiinet.net/speedtest/speedtest/')
+#    print speedTest.upload('http://down.yiinet.net/speedtest/speedtest/upload.aspx')
+    print speedTest.ping('http://speed.dtgt.org/speedtest/upload.php')
+#    print speedTest.download('http://speed.dtgt.org/speedtest/')
+#    print speedTest.upload('http://speed.dtgt.org/speedtest/upload.php')
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hs:o:", ["help", "server=", "output="])
     except getopt.GetoptError, err:
@@ -193,7 +211,8 @@ def main():
             sys.exit()
         elif o in ("-o", "--output"):
             speedTest.output = open(a, 'w')
-    results = speedTest.pingAll()
+    speedTest.smartTest()
+    #    results = speedTest.pingAll()
     #    cityDict = {}
     #    for result in results:
     #        server = result['server']
